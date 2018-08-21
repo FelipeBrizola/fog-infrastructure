@@ -1,0 +1,1 @@
+# coap-resource-mapping
