@@ -88,7 +88,8 @@ class Infrastructure():
             project.close()
             print '    sent to ' + container.name
 
-        # os.remove('../CoAPthon.tar')
+        os.remove('../CoAPthon.tar')
+        os.remove('../manage_resources_sock.tar')
 
         print 'Send project folder to containers: DONE'
 
