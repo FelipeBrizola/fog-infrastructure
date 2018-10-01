@@ -28,7 +28,7 @@ class Infrastructure():
                 break
 
         if (target_container):    
-            (exit_code, output) = container.exec_run(workdir='/CoAPthon/infrastructure', cmd='python manage_resources_sock.py -o a  -r' + ' ' + resource)
+            (exit_code, output) = container.exec_run(workdir='/CoAPthon', cmd='python manage_resources_sock.py -o a  -r' + ' ' + resource)
             print output
             if exit_code == 0:
                 print '    resource ' + resource + ' has added on ' + str(target_container.name)
@@ -51,7 +51,7 @@ class Infrastructure():
                 break
 
         if (target_container):    
-            (exit_code, output) = container.exec_run(workdir='/CoAPthon/infrastructure', cmd='python manage_resources_sock.py -o d  -r' + ' ' + resource)
+            (exit_code, output) = container.exec_run(workdir='/CoAPthon', cmd='python manage_resources_sock.py -o d  -r' + ' ' + resource)
             print output
             if exit_code == 0:
                 print '    resource ' + resource + ' has deleted from ' + str(target_container.name)
@@ -74,7 +74,7 @@ class Infrastructure():
                 break
 
         if (target_container):    
-            (exit_code, output) = container.exec_run(workdir='/CoAPthon/infrastructure', cmd='python manage_resources_sock.py -o l')
+            (exit_code, output) = container.exec_run(workdir='/CoAPthon', cmd='python manage_resources_sock.py -o l')
             print output
         else:
             print '    container not found'

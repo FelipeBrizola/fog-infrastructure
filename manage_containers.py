@@ -74,16 +74,21 @@ class Infrastructure():
         print 'Send project folder to containers: IN PROGRESS'
 
         # generate tar file
-        self.make_tarfile('../../CoAPthon.tar', '../CoAPthon/')
+        self.make_tarfile('../CoAPthon.tar', '../CoAPthon')
+        self.make_tarfile('../manage_resources_sock.tar', './manage_resources_sock.py')
 
         # put on containers
         for container in containers:
             project = open('../CoAPthon.tar', 'r')
             container.put_archive(path='/', data=project)
+
+            project = open('../manage_resources_sock.tar', 'r')
+            container.put_archive(path='/CoAPthon', data=project)
+
             project.close()
             print '    sent to ' + container.name
 
-        os.remove('./CoAPthon.tar')
+        # os.remove('../CoAPthon.tar')
 
         print 'Send project folder to containers: DONE'
 

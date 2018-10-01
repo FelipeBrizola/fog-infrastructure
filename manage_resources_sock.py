@@ -113,7 +113,7 @@ if __name__ == "__main__":
             listener_thread.start()
 
         else:
-            raise ValueError('test: Missing params')
+            raise ValueError('manage_resources_sock: Missing params')
 
     except getopt.GetoptError as err:
         print str(err)
