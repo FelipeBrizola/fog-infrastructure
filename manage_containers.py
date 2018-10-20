@@ -76,20 +76,33 @@ class Infrastructure():
         # generate tar file
         self.make_tarfile('../CoAPthon.tar', '../CoAPthon')
         self.make_tarfile('../manage_resources_sock.tar', './manage_resources_sock.py')
+        self.make_tarfile('../resource_mapping.tar', '../resource_mapping')
+        self.make_tarfile('../coapclient.tar', '/usr/local/lib/python2.7/site-packages/coapthon')
 
         # put on containers
         for container in containers:
             project = open('../CoAPthon.tar', 'r')
             container.put_archive(path='/', data=project)
+            project.close()
 
             project = open('../manage_resources_sock.tar', 'r')
             container.put_archive(path='/CoAPthon', data=project)
-
             project.close()
+
+            project = open('../resource_mapping.tar', 'r')
+            container.put_archive(path='/', data=project)
+            project.close()
+
+            project = open('../coapclient.tar', 'r')
+            container.put_archive(path='/usr/local/lib/python2.7/site-packages', data=project)
+            project.close()
+
             print '    sent to ' + container.name
 
         os.remove('../CoAPthon.tar')
         os.remove('../manage_resources_sock.tar')
+        os.remove('../resource_mapping.tar')
+        os.remove('../coapclient.tar')
 
         print 'Send project folder to containers: DONE'
 
@@ -111,8 +124,8 @@ class Infrastructure():
         print 'Run coap servers: IN PROGRESS'
 
         for container in containers:
-            container.exec_run(workdir='/CoAPthon',
-                            cmd='python coapserver.py', detach=True)
+            container.exec_run(workdir='/CoAPthon', cmd='python coapserver.py', detach=True)
+            container.exec_run(workdir='/resource_mapping', cmd='python synchronizer.py', detach=True)
             print '    coap server is running on ' + container.name
 
         print 'Run coap servers: DONE'
