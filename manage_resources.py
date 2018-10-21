@@ -77,6 +77,36 @@ class Infrastructure():
 
         print 'List resource: DONE'
 
+    def print_fog_state(self, id=None):
+        print 'Print fog state: IN PROGRESS'
+
+        if id != None:
+            print '    container id: ' + str(id)
+            target_container_name = self.container_prefix_name + id
+            containers = self.docker_client.containers.list()
+            target_container = None
+
+            for container in containers:
+                if (container.name == target_container_name):
+                    target_container = container
+                    break
+
+            if target_container == None:
+                print '    container not found'
+                return
+
+            (exit_code, output) = target_container.exec_run(workdir='/resource_mapping', cmd='python synchronizer_sock.py -o p')
+            print output
+
+        # print all containers
+        else:
+            print '    print all containers'
+            for container in self.docker_client.containers.list():
+                (exit_code, output) = container.exec_run(workdir='/resource_mapping', cmd='python synchronizer_sock.py -o p')
+                print output
+
+        print 'Print fog state: DONE'
+
 if __name__ == '__main__':
 
     infrastructure = Infrastructure()
@@ -93,21 +123,23 @@ if __name__ == '__main__':
             # id, resource_name
             if o in ('-o', '--operation'):
                 operation = arg
-
             elif o in ('-i', '--id'):
                 id = arg
-
             elif o in ('-r', '--resource'):
                 resource = arg
 
         if (operation == 'l' and id):
             infrastructure.list_resources(id)
 
+        elif (operation == 'p'):
+            infrastructure.print_fog_state(id)
+
         elif (operation == 'a' and id and resource):
             infrastructure.add_resource(id, resource)
 
         elif (operation == 'd' and id and resource):
             infrastructure.del_resource(id, resource)
+
         else:
             raise ValueError('manage_resources: Missing params')
 
