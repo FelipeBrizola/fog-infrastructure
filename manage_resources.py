@@ -80,10 +80,11 @@ class Infrastructure():
     def print_fog_state(self, id=None):
         print 'Print fog state: IN PROGRESS'
 
+        containers = self.docker_client.containers.list()
+
         if id != None:
-            print '    container id: ' + str(id)
+            print '    container id: ' + str(id) + ' \n'
             target_container_name = self.container_prefix_name + id
-            containers = self.docker_client.containers.list()
             target_container = None
 
             for container in containers:
@@ -100,8 +101,8 @@ class Infrastructure():
 
         # print all containers
         else:
-            print '    print all containers'
-            for container in self.docker_client.containers.list():
+            print '    print all containers \n'
+            for container in containers:
                 (exit_code, output) = container.exec_run(workdir='/resource_mapping', cmd='python synchronizer_sock.py -o p')
                 print output
 
