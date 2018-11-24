@@ -119,12 +119,14 @@ class Infrastructure():
         print 'Create network: DONE'
 
 
-    def run_coap_servers(self, containers):
+    def run_coap_servers(self, containers, type):
 
         print 'Run coap servers: IN PROGRESS'
 
+        command = 'python coapserver_' + type + '.py'
+
         for container in containers:
-            container.exec_run(workdir='/CoAPthon', cmd='python coapserver.py', detach=True)
+            container.exec_run(workdir='/CoAPthon', cmd=command, detach=True)
             container.exec_run(workdir='/resource_mapping', cmd='python synchronizer.py', detach=True)
             print '    coap server is running on ' + container.name
 
@@ -144,7 +146,7 @@ class Infrastructure():
         return len(list_ids)
 
 
-    def add_container(self):
+    def add_container(self, type):
 
         print 'Add container: IN PROGRESS'
 
@@ -159,7 +161,7 @@ class Infrastructure():
         self.push_project(containers)
 
         # run coap server on each container
-        self.run_coap_servers(containers)
+        self.run_coap_servers(containers, type)
 
         print 'Add container: DONE'
 
@@ -200,7 +202,7 @@ class Infrastructure():
         print 'Purge containers: DONE'
 
 
-    def build_farm(self, containers_quantity):
+    def build_farm(self, containers_quantity, type):
 
         print 'Build farm: IN PROGRESS'
 
@@ -217,7 +219,7 @@ class Infrastructure():
         self.push_project(containers)
 
         # run coap server on each container
-        self.run_coap_servers(containers)
+        self.run_coap_servers(containers, type)
 
         print 'Build farm: DONE'
 
@@ -227,19 +229,39 @@ if __name__ == '__main__':
     infrastructure = Infrastructure()
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'ao:r:b:po', [
-                                   'add', 'remove=', 'build=', 'purge'])
+        opts, args = getopt.getopt(sys.argv[1:], 'ao:r:b:po:t:', [
+                                   'add', 'remove=', 'build=', 'purge', 'type='])
+
+        type = None,
+        quantity = 0
+        operation = None
+        id = None
 
         # TODO: add or remove resource from container
         for o, arg in opts:
             if o in ('-a', '--add'):
-                infrastructure.add_container()
+                operation = '-a'
             elif o in ('-r', '--remove'):
-                infrastructure.remove_container(arg)
+                operation = '-r'
+                id = arg
             elif o in ('-b', '--build'):
-                infrastructure.build_farm(int(arg))
+                quantity = int(arg)
+                operation = '-b'
             elif o in ('-p', '--purge'):
                 infrastructure.purge()
+            elif o in ('-t', '--type'):
+                type = arg
+
+                print type
+                if type != 'city' and type != 'farm':
+                    raise ValueError('type should be city or farm')
+
+        if operation == '-b':
+            infrastructure.build_farm(quantity, type)
+        elif operation == '-a':
+            infrastructure.add_container(type)
+        elif operation == '-r':            
+            infrastructure.remove_container(id)
 
     except getopt.GetoptError as err:
         print str(err)
